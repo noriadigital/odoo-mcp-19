@@ -19,7 +19,7 @@ import secrets
 import threading
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +58,8 @@ from .safety import (
     classify_workflow,
     is_side_effect_method,
 )
-from .user_clients import current_role  # noqa: E402
 from .safety_profile import get_profile  # noqa: E402
+from .user_clients import current_role  # noqa: E402
 from .utils import (
     _get_live_doc,
     _track_model_issue,
@@ -402,8 +402,13 @@ def execute_method(
             # Only when the profile asks for it AND this is a write-shaped call.
             if get_profile().validate_payloads and is_side_effect_method(method):
                 from .safety import validate_payload_against_schema as _validate_payload
+
                 _validation = _validate_payload(
-                    odoo, model, method, args=args, kwargs=kwargs,
+                    odoo,
+                    model,
+                    method,
+                    args=args,
+                    kwargs=kwargs,
                 )
                 if not _validation.ok:
                     elapsed_ms = (time.time() - start_time) * 1000
