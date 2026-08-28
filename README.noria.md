@@ -86,6 +86,33 @@ Pedirle a Claude: *"Listame los primeros 5 partners de Odoo"*. Debería llamar a
   que paginar con `offset` hasta cubrir `search_count`.
 - Para apuntar a otra instancia de Odoo alcanza con cambiar el `.env` (no hace falta rebuild).
 
+## Skill de reportes (opcional, para Claude Code)
+
+En [skills/odoo-data-report/](skills/odoo-data-report/) hay una skill que genera un
+**reporte de comprensión** de cualquier modelo de una instancia: perfila qué campos
+tienen datos reales y clasifica el origen de cada uno (USER/CUSTOM = migra, SYSTEM = no),
+con salida en JSON y Excel. Sirve para planear migraciones y como método didáctico.
+
+Para tenerla disponible en Claude Code en todos tus proyectos, enlazala a tus skills
+personales (una sola vez):
+
+```bash
+mkdir -p ~/.claude/skills
+ln -sfn "$(pwd)/skills/odoo-data-report" ~/.claude/skills/odoo-data-report
+```
+
+Después, desde cualquier proyecto cliente (el que tenga el `.mcp.json` apuntando a la
+instancia), pedile a Claude *"generá el reporte de campos de proveedores"* o corré el
+script directo (necesita `openpyxl`):
+
+```bash
+python ~/.claude/skills/odoo-data-report/report.py \
+    --model res.partner --domain '[["supplier_rank",">",0]]' --out proveedores
+```
+
+El script descubre solo el server MCP leyendo el `.mcp.json` del proyecto, así apunta a
+la instancia que ese proyecto tenga configurada.
+
 ## Actualizar
 
 ```bash
