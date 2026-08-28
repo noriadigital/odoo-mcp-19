@@ -62,3 +62,8 @@ cyanview-*.html
 
 #Reportes de limpieza
 reportes_limpieza/
+
+# FMDC engagement — client PII, secrets & extracted/generated data (NEVER push upstream)
+fmdc/.env
+fmdc/data/
+fmdc/**/*.csv

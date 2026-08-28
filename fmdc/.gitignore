@@ -1,0 +1,13 @@
+# Secretos
+.env
+.env.local
+
+# Datos extraídos y generados (PII: CUIT, emails, tokens)
+data/
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
