@@ -36,6 +36,11 @@ class LemonSuiteClient:
     ) -> None:
         if not tenant or not token:
             raise ValueError("tenant y token son obligatorios")
+        # Aceptar tenant "pelado" (fmdclegal) o una URL completa
+        # (https://fmdclegal.lemonsuiteapp.com) → nos quedamos con el subdominio.
+        # La API v3 vive en timebillingapp.com aunque la app esté en lemonsuiteapp.com.
+        if "://" in tenant or "." in tenant:
+            tenant = tenant.split("://")[-1].split("/")[0].split(".")[0]
         self.tenant = tenant
         self.base_url = f"https://{tenant}.timebillingapp.com/api/v3"
         self.timeout = timeout

@@ -47,6 +47,7 @@ class WorkLog:
         self._plane = None
         self._project_id = os.environ.get("PLANE_PROJECT_ID", "")
         self._done_state_id = os.environ.get("PLANE_DONE_STATE_ID", "")
+        self._cycle_id = os.environ.get("PLANE_CYCLE_ID", "")
         if os.environ.get("PLANE_ENABLED", "").lower() == "true":
             self._init_plane()
 
@@ -79,9 +80,13 @@ class WorkLog:
             desc = f"<p>{detail}</p>" if detail else None
             state = self._done_state_id if done else None
             try:
-                self._plane.create_work_item(
+                item = self._plane.create_work_item(
                     self._project_id, name, description_html=desc, state_id=state
                 )
+                if self._cycle_id and item.get("id"):
+                    self._plane.add_issues_to_cycle(
+                        self._project_id, self._cycle_id, [item["id"]]
+                    )
             except Exception as exc:  # noqa: BLE001 — el worklog no debe romper la migración
                 print(f"  ! Plane no registró '{name}': {exc}")
 

@@ -84,6 +84,35 @@ class PlaneClient:
     def list_states(self, project_id: str) -> list[dict]:
         return list(self._paginate(f"projects/{project_id}/states/"))
 
+    # --- Cycles ---
+    def list_cycles(self, project_id: str) -> list[dict]:
+        return list(self._paginate(f"projects/{project_id}/cycles/"))
+
+    def create_cycle(
+        self,
+        project_id: str,
+        name: str,
+        *,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        description: str | None = None,
+    ) -> dict:
+        payload: dict[str, Any] = {"name": name[:255]}
+        if start_date:
+            payload["start_date"] = start_date
+        if end_date:
+            payload["end_date"] = end_date
+        if description:
+            payload["description"] = description
+        return self._request("POST", f"projects/{project_id}/cycles/", json=payload).json()
+
+    def add_issues_to_cycle(self, project_id: str, cycle_id: str, issue_ids: list[str]) -> dict:
+        return self._request(
+            "POST",
+            f"projects/{project_id}/cycles/{cycle_id}/cycle-issues/",
+            json={"issues": issue_ids},
+        ).json()
+
     # --- Escrituras (worklog) ---
     def create_work_item(
         self,
@@ -93,6 +122,7 @@ class PlaneClient:
         description_html: str | None = None,
         state_id: str | None = None,
         priority: str | None = None,
+        parent: str | None = None,
     ) -> dict:
         payload: dict[str, Any] = {"name": name[:255]}
         if description_html:
@@ -101,6 +131,8 @@ class PlaneClient:
             payload["state"] = state_id
         if priority:
             payload["priority"] = priority
+        if parent:
+            payload["parent"] = parent
         return self._request("POST", f"projects/{project_id}/work-items/", json=payload).json()
 
     def update_work_item(self, project_id: str, item_id: str, **fields: Any) -> dict:
